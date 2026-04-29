@@ -1,6 +1,6 @@
 # DAT257 - Agile Software Project Management
 
-### Set up:
+## Set up:
 1 Create and activate a viritual env in the backend folder
 
 2 Install dependencies from requirements.txt
