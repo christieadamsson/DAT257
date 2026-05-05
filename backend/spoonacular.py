@@ -6,20 +6,20 @@ load_dotenv()
 
 API_KEY = os.getenv("SPOONACULAR_API_KEY")
 
-def search_recipes(ingredients: str):
-    url = "https://api.spoonacular.com/recipes/complexSearch"
+# def search_recipes(ingredients: str):
+#     url = "https://api.spoonacular.com/recipes/complexSearch"
 
-    params = {
-        "apiKey": API_KEY,
-        "includeIngredients": ingredients,
-        "number": 10,
-        "addRecipeInformation": True
-    }
+#     params = {
+#         "apiKey": API_KEY,
+#         "includeIngredients": ingredients,
+#         "number": 10,
+#         "addRecipeInformation": True
+#     }
 
-    response = requests.get(url, params=params)
-    data = response.json()
+#     response = requests.get(url, params=params)
+#     data = response.json()
 
-    return data.get("results", [])
+#     return data.get("results", [])
 
 
 def search_by_ingredients(ingredients: str):
@@ -36,3 +36,13 @@ def search_by_ingredients(ingredients: str):
     data = response.json()
 
     return data #.get("results", [])
+
+def get_recipe_instructions(recipe_id: int):
+    url = f"https://api.spoonacular.com/recipes/{recipe_id}/analyzedInstructions"
+
+    params = {
+        "apiKey": API_KEY,
+    }
+
+    response = requests.get(url, params=params)
+    return response.json()

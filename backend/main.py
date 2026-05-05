@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from spoonacular import search_by_ingredients
+from spoonacular import search_by_ingredients, get_recipe_instructions
 
 app = FastAPI()
 
@@ -17,3 +17,7 @@ def get_recipes(ingredients: str = Query("")):
     
 
     return {"results": recipes}
+
+@app.get("/recipes/{recipe_id}/instructions")
+def get_instructions(recipe_id: int):
+    return get_recipe_instructions(recipe_id)
