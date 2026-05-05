@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from spoonacular import search_recipes
-from recipe_logic import rank_recipes
+from spoonacular import search_by_ingredients
 
 app = FastAPI()
 
@@ -14,7 +13,7 @@ app.add_middleware(
 
 @app.get("/recipes")
 def get_recipes(ingredients: str = Query("")):
-    recipes = search_recipes(ingredients)
-    ranked = rank_recipes(recipes, ingredients)
+    recipes = search_by_ingredients(ingredients)
+    
 
-    return {"results": ranked}
+    return {"results": recipes}

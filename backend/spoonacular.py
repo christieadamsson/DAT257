@@ -13,10 +13,26 @@ def search_recipes(ingredients: str):
         "apiKey": API_KEY,
         "includeIngredients": ingredients,
         "number": 10,
-        "addRecipeInformation": True,
+        "addRecipeInformation": True
     }
 
     response = requests.get(url, params=params)
     data = response.json()
 
     return data.get("results", [])
+
+
+def search_by_ingredients(ingredients: str):
+    url = "https://api.spoonacular.com/recipes/findByIngredients"
+
+    params = {
+        "apiKey": API_KEY,
+        "ingredients": ingredients,
+        "number": 10,
+        "ranking": 1
+    }
+
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    return data #.get("results", [])
