@@ -26,7 +26,7 @@ export default function Page() {
     );
 
     const data = await res.json();
-    setRecipes(data.results || []);
+    setRecipes(data.results || []); 
   }
 
   return (
@@ -78,7 +78,23 @@ export default function Page() {
               <h3>{r.title}</h3>
               {r.image && <img src={r.image} width={150} />}
 
-              <p>Match: {used}/{total}</p>
+              <p>Matching ingredients at home: {used}/{total}</p>
+
+              <p>Seasonal ingredients:</p>
+
+                {r.seasonal_ingredients?.length > 0 ? (
+                  <ul>
+                    {r.seasonal_ingredients.map((ingredient: string, idx: number) => (
+                      <li key={idx}>{ingredient}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No seasonal ingredients</p>
+                )}
+
+              <p>
+                Seasonal match: {Math.round((r.seasonal_match || 0) * 100)}%
+              </p>
 
               <p>Missing ingredients to buy:</p>
               {missingIngredients.length > 0 ? (
