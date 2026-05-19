@@ -10,6 +10,7 @@ export default function Page() {
   const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
   const [instructions, setInstructions] = useState<any>(null);
   const [recipeInfo, setRecipeInfo] = useState<any>(null);
+  const [recipeInfoById, setRecipeInfoById] = useState<Record<number, any>>({});
   const [showFilters, setShowFilters] = useState(false);
   const [dietFilters, setDietFilters] = useState({
     glutenFree: false,
@@ -30,6 +31,7 @@ export default function Page() {
   function clearSearch() {
     setIngredients([]);
     setRecipes([]);
+    setRecipeInfoById({});
     setDietFilters({
       glutenFree: false,
       vegetarian: false,
@@ -45,7 +47,25 @@ export default function Page() {
     );
 
     const data = await res.json();
-    setRecipes(data.results || []); 
+    const recipeResults = data.results || [];
+    setRecipes(recipeResults);
+
+    const infoEntries = await Promise.all(
+      recipeResults.map(async (recipe: any) => {
+        try {
+          const infoRes = await fetch(
+            `http://localhost:8000/recipes/${recipe.id}/information`
+          );
+          const infoData = await infoRes.json();
+          return [recipe.id, infoData];
+        } catch (error) {
+          console.error(`Could not fetch information for recipe ${recipe.id}`, error);
+          return [recipe.id, null];
+        }
+      })
+    );
+
+    setRecipeInfoById(Object.fromEntries(infoEntries));
   }
 
   async function openInstructions(recipe: any) {
@@ -60,11 +80,21 @@ export default function Page() {
     const instructionsData = await instructionsRes.json();
     setInstructions(instructionsData);
 
-    const infoRes = await fetch(
-      `http://localhost:8000/recipes/${recipe.id}/information`
-    );
-    const infoData = await infoRes.json();
-    setRecipeInfo(infoData);
+    const cachedRecipeInfo = recipeInfoById[recipe.id];
+
+    if (cachedRecipeInfo) {
+      setRecipeInfo(cachedRecipeInfo);
+    } else {
+      const infoRes = await fetch(
+        `http://localhost:8000/recipes/${recipe.id}/information`
+      );
+      const infoData = await infoRes.json();
+      setRecipeInfo(infoData);
+      setRecipeInfoById((prev) => ({
+        ...prev,
+        [recipe.id]: infoData,
+      }));
+    }
   }
 
   function closePopup() {
@@ -110,10 +140,19 @@ export default function Page() {
   }
 
   function recipeMatchesDietFilters(recipe: any) {
-    if (dietFilters.glutenFree && !recipe.glutenFree) return false;
-    if (dietFilters.vegetarian && !recipe.vegetarian) return false;
-    if (dietFilters.vegan && !recipe.vegan) return false;
-    if (dietFilters.dairyFree && !recipe.dairyFree) return false;
+    const info = recipeInfoById[recipe.id];
+
+    if (!info) {
+      return !dietFilters.glutenFree &&
+        !dietFilters.vegetarian &&
+        !dietFilters.vegan &&
+        !dietFilters.dairyFree;
+    }
+
+    if (dietFilters.glutenFree && !info.glutenFree) return false;
+    if (dietFilters.vegetarian && !info.vegetarian) return false;
+    if (dietFilters.vegan && !info.vegan) return false;
+    if (dietFilters.dairyFree && !info.dairyFree) return false;
 
     return true;
   }
