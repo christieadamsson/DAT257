@@ -250,3 +250,16 @@ def get_recipe_instructions(recipe_id: int):
 
     response = requests.get(url, params=params)
     return response.json()
+
+
+def get_recipe_wine_diet(recipe_id):
+    url = f"https://api.spoonacular.com/recipes/{recipe_id}/information"
+
+    params = {
+        "apiKey": API_KEY,
+        "includeNutrition": "true",
+        "addWinePairing": "true",
+    }
+
+    response = requests.get(url, params=params)
+    return response.json()
