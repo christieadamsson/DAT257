@@ -30,7 +30,9 @@ body {
 */
 
 body {
-  font-family: Arial, sans-serif;
-  background: #fff;
+
+  font-family: var(--font-montserrat), sans-serif;
+
+  background: #f7f8ef;
   color: #000;
 }
